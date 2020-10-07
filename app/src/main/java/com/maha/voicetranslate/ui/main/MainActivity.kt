@@ -57,14 +57,14 @@ class MainActivity : AppCompatActivity(),
             tur_heading_txt.hide()
             txtSpeechInput_eng.text=""
             txtSpeechInput_tur.text=""
-          /*  if(isInternetAvailable(this)) {
+            if(isInternetAvailable(this)) {
                 promptSpeechInput()
             }else{
                 root_layout.snackbar(getString(R.string.check_internet))
-            }*/
-              val aText="This is sample text and converted to simple text."
+            }
+             /* val aText="This is sample text and converted to simple text."
               mLoginViewModel.callTranslate(aText)
-              txtSpeechInput_eng.text = aText
+              txtSpeechInput_eng.text = aText*/
         }
     }
 
