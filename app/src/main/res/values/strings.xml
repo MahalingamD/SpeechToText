@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SpeechToText</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="tap_on_mic">Tap on mic to speak</string>
+    <string name="english_text">English Text</string>
+    <string name="turkish_text">Turkish Text</string>
+    <string name="check_internet">Please check your Internet Connection</string>
+    <string name="pls_wait">Please wait a minute</string>
+    <string name="label_exit_alert">Press once again to exit!</string>
+
+</resources>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1077419803495",
+    "firebase_url": "https://voicetranslate-ef250.firebaseio.com",
+    "project_id": "voicetranslate-ef250",
+    "storage_bucket": "voicetranslate-ef250.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1077419803495:android:3ee05afe990e7d2a7065c2",
+        "android_client_info": {
+          "package_name": "com.maha.voicetranslate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1077419803495-ac9hsjc7fveg72g8g5fvv76hg2hhl86l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtctgt191fyHvj6xTeAsu2MZ7k_VMxWfM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1077419803495-ac9hsjc7fveg72g8g5fvv76hg2hhl86l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
