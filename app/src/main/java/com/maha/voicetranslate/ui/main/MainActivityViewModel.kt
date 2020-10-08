@@ -7,30 +7,39 @@ import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguag
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions
 
-class MainActivityViewModel :ViewModel() {
+class MainActivityViewModel : ViewModel() {
 
-    lateinit var  englishGermanTranslator : FirebaseTranslator
+    lateinit var englishTurkishTranslator: FirebaseTranslator
 
     lateinit var mMainListener: MainListener
 
-    fun downloadViewModel(){
+    fun setTrnaslateLanguage(aLocale: String): Int {
+        return when (aLocale) {
+            "ar" -> FirebaseTranslateLanguage.AR
+            "en" -> FirebaseTranslateLanguage.EN
+            "tr" -> FirebaseTranslateLanguage.TR
+            else -> FirebaseTranslateLanguage.TR
+        }
+    }
+
+    fun downloadViewModel(aSource:String,aTarget:String) {
 
         try {
             val options = FirebaseTranslatorOptions.Builder()
-                .setSourceLanguage(FirebaseTranslateLanguage.EN)
-                .setTargetLanguage(FirebaseTranslateLanguage.TR)
+                .setSourceLanguage(setTrnaslateLanguage(aSource))
+                .setTargetLanguage(setTrnaslateLanguage(aTarget))
                 .build()
-            englishGermanTranslator = FirebaseNaturalLanguage.getInstance().getTranslator(options)
+            englishTurkishTranslator = FirebaseNaturalLanguage.getInstance().getTranslator(options)
 
 
-            englishGermanTranslator.downloadModelIfNeeded()
+            englishTurkishTranslator.downloadModelIfNeeded()
                 .addOnSuccessListener {
                     // Model downloaded successfully. Okay to start translating.
                     mMainListener.success("Success")
                 }
                 .addOnFailureListener { exception ->
                     // Model couldn’t be downloaded or other internal error.
-                    Log.e("error",exception.message?:"internal error")
+                    Log.e("error", exception.message ?: "internal error")
                     mMainListener.error("Success")
                 }
         } catch (e: Exception) {
@@ -39,22 +48,22 @@ class MainActivityViewModel :ViewModel() {
         }
     }
 
-     fun callTranslate(aText:String) {
+    fun callTranslate(aText: String) {
 
-         try {
-             englishGermanTranslator.translate(aText)
-                 .addOnSuccessListener { translatedText ->
-                     // Translation successful.
-                     mMainListener.success("aTranslate",translatedText)
-                 }
-                 .addOnFailureListener { exception ->
-                     // Error.
-                     mMainListener.error("aTranslate")
-                 }
-         } catch (e: Exception) {
-             e.printStackTrace()
-         }
-     }
+        try {
+            englishTurkishTranslator.translate(aText)
+                .addOnSuccessListener { translatedText ->
+                    // Translation successful.
+                    mMainListener.success("aTranslate", translatedText)
+                }
+                .addOnFailureListener { exception ->
+                    // Error.
+                    mMainListener.error("aTranslate")
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
 
 
