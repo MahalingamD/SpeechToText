@@ -44,12 +44,13 @@ dependencies {
     implementation "com.google.firebase:firebase-ml-natural-language:22.0.1"
     implementation "com.google.firebase:firebase-ml-natural-language-translate-model:20.0.9"
 
-
+    implementation 'com.karumi:dexter:5.0.0'
     //ProgressDialog
     implementation "com.pnikosis:materialish-progress:1.7"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

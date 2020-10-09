@@ -3,6 +3,10 @@
     package="com.maha.voicetranslate">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".AppController"
@@ -12,6 +16,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBzrUFhpEGyo7i2JOXzyub95CyzNqlqOsc" />
+
         <activity android:name=".ui.splash.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -23,6 +32,10 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.map.GoogleMapActivity"
+            android:label="Map" />
 
     </application>
 
