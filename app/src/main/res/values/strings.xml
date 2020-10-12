@@ -13,5 +13,6 @@
     <string name="target_language">Target Language</string>
     <string name="near_east_university">Near East University - International Research Center for AI and IoT</string>
     <string name="no_event_today">Today you have no events</string>
+    <string name="google_cal">Kindly install Google Calender application</string>
 
 </resources>

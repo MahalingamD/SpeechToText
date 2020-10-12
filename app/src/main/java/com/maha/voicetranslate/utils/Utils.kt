@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import android.view.View
 import android.widget.ImageView
@@ -113,3 +115,45 @@ fun calenderPermission(aContext: Context): Boolean {
         aContext,
         Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED
 }
+
+
+fun isPackageInstalled(packagename: String?, context: Context): Boolean {
+    val pm = context.packageManager
+    return try {
+        pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
+}
+
+fun openPlaystore(aContext: Context,aPackage:String){
+    try {
+        aContext.startActivity( Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$aPackage")))
+    } catch (e:Exception) {
+        aContext.startActivity( Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$aPackage")))
+    }
+}
+
+
+fun showActionAlert(aContext: Context, aMessage: String) {
+    try {
+        val builder = AlertDialog.Builder(aContext)
+        builder.setMessage(aMessage).setTitle(aContext.getString(R.string.app_name))
+            .setCancelable(false).setPositiveButton("OK") { dialog, id ->
+                dialog.dismiss()
+                openPlaystore(aContext,"com.google.android.calendar")
+            }
+
+
+        val alert = builder.create()
+        alert.show()
+        // Change the buttons color in dialog
+        val pbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE)
+        pbutton.setTextColor(ContextCompat.getColor(aContext, R.color.black))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+

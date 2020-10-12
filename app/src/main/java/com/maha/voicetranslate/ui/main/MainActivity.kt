@@ -153,10 +153,16 @@ class MainActivity : AppCompatActivity(),
         }
 
         map_BUT.setOnClickListener {
-            if (calenderPermission(this))
-                getCurrentCalaender(this)
-            else
-                requestPermission()
+
+            if(isPackageInstalled("com.google.android.calendar",this)){
+                if (calenderPermission(this))
+                    getCurrentCalaender(this)
+                else
+                    requestPermission()
+            }else{
+                showActionAlert(this, getString(R.string.google_cal))
+            }
+
         }
     }
 
