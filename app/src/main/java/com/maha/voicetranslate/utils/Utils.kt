@@ -1,6 +1,10 @@
 package com.maha.voicetranslate.utils
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -8,7 +12,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import com.maha.voicetranslate.R
 
 
 fun ProgressBar.show() {
@@ -79,4 +85,31 @@ fun View.snackbar(message:String){
      }
 
      return result
+}
+
+fun showAlert(aContext: Context, aMessage: String) {
+    try {
+        val builder = AlertDialog.Builder(aContext)
+        builder.setMessage(aMessage).setTitle(aContext.getString(R.string.app_name))
+            .setCancelable(false).setPositiveButton("OK") { dialog, id ->
+                dialog.dismiss()
+            }
+
+
+        val alert = builder.create()
+        alert.show()
+        // Change the buttons color in dialog
+        val pbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE)
+        pbutton.setTextColor(ContextCompat.getColor(aContext, R.color.black))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+
+fun calenderPermission(aContext: Context): Boolean {
+    return ContextCompat.checkSelfPermission(aContext,
+        Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+        aContext,
+        Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED
 }

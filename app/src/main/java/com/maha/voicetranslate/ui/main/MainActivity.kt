@@ -10,24 +10,22 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.speech.RecognizerIntent
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.gms.maps.model.LatLng
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.maha.voicetranslate.R
+import com.maha.voicetranslate.model.EventDetail
 import com.maha.voicetranslate.ui.map.GoogleMapActivity
 import com.maha.voicetranslate.utils.*
 import kotlinx.android.synthetic.main.activity_main.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -45,10 +43,10 @@ class MainActivity : AppCompatActivity(),
     lateinit var mProgressDialog: ProgressDialog
 
     var mLanguageList = arrayListOf("Arabic", "English", "Turkish")
-    var aFromLang = "en"
-    var aToLang = "tr"
+    var mFromLang = "en"
+    var mToLang = "tr"
 
-    val aLatlngList= arrayListOf<LatLng>()
+    val mEventList = arrayListOf<EventDetail>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +60,7 @@ class MainActivity : AppCompatActivity(),
         modelDownload()
         requestPermission()
 
-        getCurrentCalaender(this)
+        //getCurrentCalaender(this)
 
         setSpinnerAdapter()
 
@@ -95,7 +93,7 @@ class MainActivity : AppCompatActivity(),
             txtSpeechInput_eng.text = ""
             txtSpeechInput_tur.text = ""
 
-           /* if (aFromLang != aToLang) {
+            if (mFromLang != mToLang) {
                 if (isInternetAvailable(this)) {
                     promptSpeechInput()
                 } else {
@@ -103,12 +101,7 @@ class MainActivity : AppCompatActivity(),
                 }
             } else {
                 root_layout.snackbar(getString(R.string.lang_validation))
-            }*/
-
-            val aIntent=Intent(this,GoogleMapActivity::class.java)
-
-            aIntent.putExtra("latlng",aLatlngList)
-            startActivity(aIntent)
+            }
 
 
             /* val aText="This is sample text and converted to simple text."
@@ -124,11 +117,11 @@ class MainActivity : AppCompatActivity(),
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
                 try {
                     when (position) {
-                        0 -> aFromLang = "ar"
+                        0 -> mFromLang = "ar"
 
-                        1 -> aFromLang = "en"
+                        1 -> mFromLang = "en"
 
-                        2 -> aFromLang = "tr"
+                        2 -> mFromLang = "tr"
                     }
                     modelDownload()
                 } catch (e: Exception) {
@@ -144,11 +137,11 @@ class MainActivity : AppCompatActivity(),
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
                 try {
                     when (position) {
-                        0 -> aToLang = "ar"
+                        0 -> mToLang = "ar"
 
-                        1 -> aToLang = "en"
+                        1 -> mToLang = "en"
 
-                        2 -> aToLang = "tr"
+                        2 -> mToLang = "tr"
                     }
                     modelDownload()
 
@@ -158,15 +151,35 @@ class MainActivity : AppCompatActivity(),
             }
 
         }
+
+        map_BUT.setOnClickListener {
+            if (calenderPermission(this))
+                getCurrentCalaender(this)
+            else
+                requestPermission()
+        }
+    }
+
+    private fun callMapActivity() {
+
+        if (mEventList.isNullOrEmpty()) {
+            showAlert(this, getString(R.string.no_event_today))
+        } else {
+            val aIntent = Intent(this, GoogleMapActivity::class.java)
+            val aBundle = Bundle()
+            aBundle.putSerializable("EventList", mEventList)
+            aIntent.putExtra("BUNDLE", aBundle)
+            startActivity(aIntent)
+        }
     }
 
 
     fun modelDownload() {
         try {
             if (isInternetAvailable(this@MainActivity)) {
-                if (aFromLang != aToLang) {
+                if (mFromLang != mToLang) {
                     started(getString(R.string.pls_wait))
-                    mLoginViewModel.downloadViewModel(aFromLang, aToLang)
+                    mLoginViewModel.downloadViewModel(mFromLang, mToLang)
                 } else {
                     root_layout.snackbar(getString(R.string.lang_validation))
                 }
@@ -191,10 +204,8 @@ class MainActivity : AppCompatActivity(),
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
 
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, aFromLang)
-            // intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, myLocale)
-            //intent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, myLocale)
-            intent.putExtra("android.speech.extra.EXTRA_ADDITIONAL_LANGUAGES", arrayOf(aFromLang))
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, mFromLang)
+            intent.putExtra("android.speech.extra.EXTRA_ADDITIONAL_LANGUAGES", arrayOf(mFromLang))
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt))
             try {
                 startActivityForResult(intent, REQ_CODE_SPEECH_INPUT)
@@ -208,32 +219,6 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        try {
-            when (requestCode) {
-                REQ_CODE_SPEECH_INPUT -> {
-                    if (resultCode == RESULT_OK && data != null) {
-
-                        val aArrayList =
-                            data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-
-                        if (!aArrayList.isNullOrEmpty()) {
-
-                            txtSpeechInput_eng.text = aArrayList[0]
-                            eng_heading_txt.text = "${getHeadingLocale(aFromLang)} Text"
-
-                            mLoginViewModel.callTranslate(aArrayList[0])
-
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     fun getHeadingLocale(aLocale: String): String {
         return when (aLocale) {
@@ -255,7 +240,7 @@ class MainActivity : AppCompatActivity(),
         mProgressDialog.dismiss()
 
         if (aMsg == "aTranslate") {
-            tur_heading_txt.text = "${getHeadingLocale(aToLang)} Text"
+            tur_heading_txt.text = "${getHeadingLocale(mToLang)} Text"
             eng_heading_txt.show()
             tur_heading_txt.show()
             txtSpeechInput_tur.text = aTransTXT
@@ -271,34 +256,9 @@ class MainActivity : AppCompatActivity(),
     }
 
 
-    private fun exitApp() {
-        try {
-            if (myBackPressed + 2000 > System.currentTimeMillis()) {
-                val aIntent = Intent(Intent.ACTION_MAIN)
-                aIntent.addCategory(Intent.CATEGORY_HOME)
-                aIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(aIntent)
-                finish()
-            } else {
-                Toast.makeText(
-                    baseContext, getString(R.string.label_exit_alert),
-                    Toast.LENGTH_SHORT
-                ).show()
-                myBackPressed = System.currentTimeMillis()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     fun getCurrentCalaender(aContext: Context) {
 
         try {
-            val nameOfEvent = arrayListOf<String>()
-            val sDate = arrayListOf<String>()
-            val eDate = arrayListOf<String>()
-            val eDesc = arrayListOf<String>()
-
 
             val startTime = Calendar.getInstance()
             startTime.set(Calendar.HOUR_OF_DAY, 0)
@@ -312,9 +272,7 @@ class MainActivity : AppCompatActivity(),
             endTime.add(Calendar.DATE, 0)
 
 
-
-
-          //  val selection = "( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " AND " + CalendarContract.Events.DTEND + " <= " + endTime.getTimeInMillis() + " )"
+            //  val selection = "( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " AND " + CalendarContract.Events.DTEND + " <= " + endTime.getTimeInMillis() + " )"
 
             val selection =
                 "( " + CalendarContract.Events.DTSTART + " >= " + startTime.timeInMillis + " AND " + CalendarContract.Events.DTEND + " <= " + endTime.timeInMillis + " )"
@@ -332,24 +290,28 @@ class MainActivity : AppCompatActivity(),
 
                 if (aCursor.count > 0) {
                     while (!aCursor.isAfterLast) {
-                        nameOfEvent.add(aCursor.getString(1))
-                        eDesc.add(aCursor.getString(2))
-                        sDate.add(aCursor.getString(3))
-                        eDate.add(aCursor.getString(4))
-                       val address=aCursor.getString(5)
 
-                       val aLatlng= mLoginViewModel.getLocationFromAddress(this,address)
+                        val aEventName = aCursor.getString(1)
+                        val address = aCursor.getString(5)
+                        val aLatlng = mLoginViewModel.getLocationFromAddress(this, address)
 
                         aLatlng?.let {
-                            aLatlngList.add(it)
+                            val aDetail = EventDetail()
+                            aDetail.aEventName = aEventName
+                            aDetail.aLatitude = it.latitude
+                            aDetail.alongitude = it.longitude
+
+                            mEventList.add(aDetail)
                         }
 
-
-                        Log.e("aLatlng?.latitude",""+aLatlng?.latitude+"///"+aLatlng?.longitude)
-                       aCursor.moveToNext()
+                        // Log.e("aLatlng?.latitude",""+aLatlng?.latitude+"///"+aLatlng?.longitude)
+                        aCursor.moveToNext()
                     }
                 }
             }
+
+            callMapActivity()
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -390,4 +352,54 @@ class MainActivity : AppCompatActivity(),
             e.printStackTrace()
         }
     }
+
+
+    @SuppressLint("SetTextI18n")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        try {
+            when (requestCode) {
+                REQ_CODE_SPEECH_INPUT -> {
+                    if (resultCode == RESULT_OK && data != null) {
+
+                        val aArrayList =
+                            data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+
+                        if (!aArrayList.isNullOrEmpty()) {
+
+                            txtSpeechInput_eng.text = aArrayList[0]
+                            eng_heading_txt.text = "${getHeadingLocale(mFromLang)} Text"
+
+                            mLoginViewModel.callTranslate(aArrayList[0])
+
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    private fun exitApp() {
+        try {
+            if (myBackPressed + 2000 > System.currentTimeMillis()) {
+                val aIntent = Intent(Intent.ACTION_MAIN)
+                aIntent.addCategory(Intent.CATEGORY_HOME)
+                aIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(aIntent)
+                finish()
+            } else {
+                Toast.makeText(
+                    baseContext, getString(R.string.label_exit_alert),
+                    Toast.LENGTH_SHORT
+                ).show()
+                myBackPressed = System.currentTimeMillis()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 }

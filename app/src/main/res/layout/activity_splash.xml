@@ -6,15 +6,38 @@
     android:layout_height="match_parent"
     tools:context=".ui.splash.SplashActivity">
 
-
-    <ImageView
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@null"
-        android:src="@drawable/ic_necuni"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <ImageView
+            android:id="@+id/splash_logo"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@null"
+            android:src="@drawable/ic_necuni"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/near_east_university"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/splash_logo"
+            tools:ignore="MissingConstraints" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

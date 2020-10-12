@@ -7,9 +7,12 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.maha.voicetranslate.R
+import com.maha.voicetranslate.model.EventDetail
 import kotlinx.android.synthetic.main.activity_google_map.*
 
 
@@ -23,7 +26,7 @@ class GoogleMapActivity : AppCompatActivity(), OnMapReadyCallback {
     var mIsEnableDirections = "0"
     val mZoomLevel = 15f
 
-
+    var mEventDetail = arrayListOf<EventDetail>()
 
     var mFragmentList = arrayListOf<Fragment>()
 
@@ -38,28 +41,15 @@ class GoogleMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
 
-
-        setDefaultFun()
     }
 
-    private fun setDefaultFun() {
 
-       // if (mIsEnableDirections == "0") map_navigation_but1.hide()
-       // else map_navigation_but1.hide()
-
-
-        map_navigation_but1.hide()
-    }
 
     private fun getBundle() {
-        //val bundle: Bundle? = intent.extras
-        //if (bundle != null) {
-
-        val alist=intent.getSerializableExtra("latlng") as ArrayList<LatLng>
-        mLatitude = intent.getDoubleExtra("latitude", 0.0)
-        mLongitude = intent.getDoubleExtra("longitude", 0.0)
-
-        // }
+        val bundle: Bundle? = intent.getBundleExtra("BUNDLE")
+        if (bundle != null) {
+            mEventDetail =  bundle.getSerializable("EventList") as ArrayList<EventDetail>
+        }
     }
 
     /**
@@ -76,19 +66,40 @@ class GoogleMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.uiSettings.isMapToolbarEnabled = true
 
-        addmarker(mLatitude, mLongitude)
+        addmarker()
 
     }
 
 
+    private fun addmarker() {
+        try {
+            mMap.clear()
 
-    private fun addmarker(aLatitude: Double, aLongitude: Double) {
-        mMap.clear()
-        val markerlocation = LatLng(aLatitude, aLongitude)
-        mMap.addMarker(MarkerOptions().position(markerlocation).title("Marker in location"))
-     //   mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerlocation, mZoomLevel))
+            if (!mEventDetail.isNullOrEmpty()) {
+                val boundsBuilder: LatLngBounds.Builder = LatLngBounds.Builder()
+
+                mEventDetail.forEach {
+                    val aMarkerLocation = LatLng(it.aLatitude, it.alongitude)
+                    mMap.addMarker(MarkerOptions().position(aMarkerLocation).title(it.aEventName))
+
+                    boundsBuilder.include(aMarkerLocation)
+                }
+                val latLngBounds = boundsBuilder.build()
+
+                val width = resources.displayMetrics.widthPixels
+                val height = resources.displayMetrics.heightPixels
+                val padding = (width * 0.10).toInt() // offset from edges of the map 10% of screen
+                val aCameraUpdateFactory =
+                    CameraUpdateFactory.newLatLngBounds(latLngBounds, width, height, padding)
+
+
+                mMap.setOnMapLoadedCallback {
+                    mMap.moveCamera(aCameraUpdateFactory)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
-
-
 
 }
